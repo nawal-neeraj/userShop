@@ -51,8 +51,10 @@ var verifyOTP = (async function (req, res, next){
     let userId = req.body.userId
 
     let result = await user.findOne({_id: userId, otp: otpNum})
-    console.log("====>Log",result)
-    res.send("true");
+    if(result){
+        return res.send({status: true, message:'OTP verified successfully'})
+    }
+    res.send("OTP not matched");
 });
 
 module.exports = { signup, verifyOTP };
