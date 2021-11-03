@@ -1,9 +1,15 @@
 const mongodb = require('mongodb');
 const mongoose = require('mongoose');
 var user = require('../modal/usermodel');
+var otpGenerator = require('../utils/otp-generater');
+var apiKey = require('../config/smsOtp.json');
+
+var key = apiKey.factor.API_KEY;
+console.log(key)
+var senderId = apiKey.factor.SENDER_ID
+const TwoFactor = new (require('2factor'))(key);
 
 var signup = (function (req, res, next) {
-    console.log(req.body.name, req.body.mobile, req.body.password)
     var log = new user({
         name: req.body.name,
         username: req.body.username,
@@ -13,11 +19,21 @@ var signup = (function (req, res, next) {
         password: req.body.password
     });
     user.findOne({ mobile: log.mobile }).then((response) => {
+        console.log("====>",log.mobile)
+        var otpNum = otpGenerator.OTPpassword()
+        console.log(otpNum)
         if (!response) {
             log.save().then((doc) => {
-                console.log('aaa', doc);
                 if (doc) {
-                    res.send({ status: true, message: 'user saved' });
+                    TwoFactor.sendTemplate([log.mobile], "StackOTP", [otpNum], senderId)
+                    .then( async (res) => {
+                        console.log("sms",res)
+                        if(res){
+                            doc.otp = otpNum
+                            await doc.save();
+                        }
+                    })
+                    res.send({ status: true, message: 'user saved', userId: doc._id });
                 } else {
                     res.send({ stauts: false, message: 'user not saved' });
                 }
@@ -26,6 +42,17 @@ var signup = (function (req, res, next) {
             res.send({ status: false, message: 'user already exist' });
         }
     });
+
 });
 
-module.exports = { signup };
+
+var verifyOTP = (async function (req, res, next){
+    let otpNum = req.body.otp
+    let userId = req.body.userId
+
+    let result = await user.findOne({_id: userId, otp: otpNum})
+    console.log("====>Log",result)
+    res.send("true");
+});
+
+module.exports = { signup, verifyOTP };
