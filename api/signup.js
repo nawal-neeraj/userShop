@@ -19,20 +19,17 @@ var signup = (function (req, res, next) {
         password: req.body.password
     });
     user.findOne({ mobile: log.mobile }).then((response) => {
-        console.log("====>",log.mobile)
         var otpNum = otpGenerator.OTPpassword()
-        console.log(otpNum)
         if (!response) {
             log.save().then((doc) => {
                 if (doc) {
                     TwoFactor.sendTemplate([log.mobile], "StackOTP", [otpNum], senderId)
-                    .then( async (res) => {
-                        console.log("sms",res)
-                        if(res){
-                            doc.otp = otpNum
-                            await doc.save();
-                        }
-                    })
+                        .then(async (res) => {
+                            if (res) {
+                                doc.otp = otpNum
+                                await doc.save();
+                            }
+                        })
                     res.send({ status: true, message: 'user saved', userId: doc._id });
                 } else {
                     res.send({ stauts: false, message: 'user not saved' });
@@ -46,13 +43,13 @@ var signup = (function (req, res, next) {
 });
 
 
-var verifyOTP = (async function (req, res, next){
+var verifyOTP = (async function (req, res, next) {
     let otpNum = req.body.otp
     let userId = req.body.userId
 
-    let result = await user.findOne({_id: userId, otp: otpNum})
-    if(result){
-        return res.send({status: true, message:'OTP verified successfully'})
+    let result = await user.findOne({ _id: userId, otp: otpNum })
+    if (result) {
+        return res.send({ status: true, message: 'OTP verified successfully' })
     }
     res.send("OTP not matched");
 });
