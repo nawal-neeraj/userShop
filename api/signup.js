@@ -1,11 +1,7 @@
-const mongodb = require('mongodb');
-const mongoose = require('mongoose');
 var user = require('../modal/usermodel');
 var otpGenerator = require('../utils/otp-generater');
 var apiKey = require('../config/smsOtp.json');
-
 var key = apiKey.factor.API_KEY;
-console.log(key)
 var senderId = apiKey.factor.SENDER_ID
 const TwoFactor = new (require('2factor'))(key);
 
@@ -20,6 +16,7 @@ var signup = (function (req, res, next) {
     });
     user.findOne({ mobile: log.mobile }).then((response) => {
         var otpNum = otpGenerator.OTPpassword()
+        // var otpNum = "0000"
         if (!response) {
             log.save().then((doc) => {
                 if (doc) {
@@ -46,12 +43,31 @@ var signup = (function (req, res, next) {
 var verifyOTP = (async function (req, res, next) {
     let otpNum = req.body.otp
     let userId = req.body.userId
-
-    let result = await user.findOne({ _id: userId, otp: otpNum })
-    if (result) {
-        return res.send({ status: true, message: 'OTP verified successfully' })
+    try {
+        let result = await user.findOne({ _id: userId, otp: otpNum })
+        if (result) {
+            result.status = "Active";
+            result.save();
+            return res.send({ status: true, message: 'OTP verified successfully' });
+        }
+        res.send("OTP did not match");
+    } catch (e) {
+        console.log(e);
     }
-    res.send("OTP not matched");
 });
 
-module.exports = { signup, verifyOTP };
+var signIn = (async function (req, res, next) {
+    let userNm = req.body.username
+    let userPass = req.body.password
+
+    let result = await user.findOne({ username: userNm, password: userPass })
+    if (result) {
+        await res.send({ status: true, message: 'Login successful', user: result })
+    }
+    else {
+        res.send({ message: "Username or Password did not match" })
+    }
+
+})
+
+module.exports = { signup, verifyOTP, signIn };
