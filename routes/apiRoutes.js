@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
-var signuproutes = require('../api/signup');
+var userCtrlRoutes = require('../controller/user.controller');
 
-router.post('/api/signup', signuproutes.signup);
-router.post('/api/verifyOtp', signuproutes.verifyOTP);
-router.post('/api/signin', signuproutes.signIn)
+router.post('/api/signup', userCtrlRoutes.signup);
+router.post('/api/verifyOtp', userCtrlRoutes.verifyOTP);
+router.post('/api/signin', userCtrlRoutes.signIn)
 
 module.exports = router;
