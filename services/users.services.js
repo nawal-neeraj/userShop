@@ -1,9 +1,12 @@
 var user = require('../modal/usermodel');
 var otpGenerator = require('../utils/otp-generater');
 var apiKey = require('../config/smsOtp.json');
+var jwt = require('jsonwebtoken');
+require('dotenv').config()
 var key = apiKey.factor.API_KEY;
 var senderId = apiKey.factor.SENDER_ID;
 const TwoFactor = new (require('2factor'))(key);
+const JWTSECRET = process.env.JWT_SECRET;
 
 var genrateOtp = (async function (req, res, next) {
     let userDetails = await user.findOne({ mobile: req.mobile });
@@ -28,6 +31,7 @@ var genrateOtp = (async function (req, res, next) {
 })
 
 var checkOTP = (async function (otpNum, userId) {
+
     try {
         let result = await user.findOne({ _id: userId, otp: otpNum });
         if (result) {
@@ -46,7 +50,10 @@ var userSignin = (async function (userNm, userPass) {
     if (!result) {
         return res.send({ status: false, message: "Username or Password did not match" });
     }
-    return result;
+    let Token = jwt.sign({ id: result._id }, JWTSECRET, { expiresIn: '400000' })
+
+    return ({ UseResult: result, token: Token });
 });
+
 
 module.exports = { genrateOtp, checkOTP, userSignin };

@@ -1,5 +1,6 @@
 var user = require('../modal/usermodel');
 var userService = require('../services/users.services')
+var tokenVarify = require('../utils/varifyToken')
 
 var signup = (async function (req, res, next) {
     var requestBody = new user({
@@ -26,7 +27,13 @@ var signIn = (async function (req, res, next) {
     let userNm = req.body.username;
     let userPass = req.body.password;
     let userResponse = await userService.userSignin(userNm, userPass);
-    res.send({ status: true, message: 'Login successful', user: userResponse });
+    res.send({ status: true, message: 'Login successful', user: userResponse.UseResult, token: userResponse.token });
 });
 
-module.exports = { signup, verifyOTP, signIn };
+var varifyToken = (async function (req, res) {
+    let token = req.params.token
+    let validateToken = await tokenVarify.tokenCheck(token, res)
+    res.send({ status: true, userDeils: validateToken })
+});
+
+module.exports = { signup, verifyOTP, signIn, varifyToken };
