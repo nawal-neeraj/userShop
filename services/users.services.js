@@ -50,7 +50,7 @@ var userSignin = (async function (userNm, userPass) {
     if (!result) {
         return res.send({ status: false, message: "Username or Password did not match" });
     }
-    let Token = jwt.sign({ id: result._id }, JWTSECRET, { expiresIn: '400000' })
+    let Token = jwt.sign({ id: result._id }, JWTSECRET, { expiresIn: '40000' })
 
     return ({ UseResult: result, token: Token });
 });

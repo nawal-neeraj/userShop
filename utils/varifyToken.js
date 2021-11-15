@@ -4,7 +4,8 @@ require('dotenv').config()
 const JWTSECRET = process.env.JWT_SECRET;
 var tokenCheck = (async function (token, res ) {
     try {
-        let decodedToken = jwt.verify(token, JWTSECRET)
+        let decodedToken = await jwt.verify(token, JWTSECRET)
+        // console.log("===>Token",decodedToken)
         if (!decodedToken.id) {
             return res.send({ status: false, message: "Please login again" });
         }
@@ -13,6 +14,7 @@ var tokenCheck = (async function (token, res ) {
     }
     catch (e) {
         console.log(e)
+        return res.send({ status: false, message: "Please login again" })
     }
 })
 
