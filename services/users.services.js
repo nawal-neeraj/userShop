@@ -55,5 +55,10 @@ var userSignin = (async function (userNm, userPass) {
     return ({ UseResult: result, token: Token });
 });
 
+var userUpdate = (async function(userId, requestBody, res){
+    let rs = await user.findByIdAndUpdate(userId, requestBody, {new:true})
+    return rs;
+})
 
-module.exports = { genrateOtp, checkOTP, userSignin };
+
+module.exports = { genrateOtp, checkOTP, userSignin, userUpdate };

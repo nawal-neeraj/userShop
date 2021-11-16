@@ -36,4 +36,20 @@ var varifyToken = (async function (req, res) {
     res.send({ status: true, userDeils: validateToken })
 });
 
-module.exports = { signup, verifyOTP, signIn, varifyToken };
+var updateProfile = (async function (req, res) {
+    let userId = req.params.userId
+    var requestBody = {
+        name: req.body.name,
+        username: req.body.username,
+        mobile: req.body.mobile,
+        dateofbirth: req.body.dateofbirth,
+        address: req.body.address,
+    }
+    let result = await userService.userUpdate(userId, requestBody, res)
+    if(!result){
+        return res.status(404).send({message:'user not found'})
+    }
+    res.status(200).send({message:"Updated successfully!"})
+});
+
+module.exports = { signup, verifyOTP, signIn, varifyToken, updateProfile };
