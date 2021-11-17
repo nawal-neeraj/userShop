@@ -48,11 +48,12 @@ var checkOTP = (async function (otpNum, userId) {
 var userSignin = (async function (userNm, userPass) {
     let result = await user.findOne({ username: userNm, password: userPass });
     if (!result) {
-        return res.send({ status: false, message: "Username or Password did not match" });
+        return ({ status: false, message: "Username or Password did not match" });
     }
-    let Token = jwt.sign({ id: result._id }, JWTSECRET, { expiresIn: '40000' })
 
-    return ({ UseResult: result, token: Token });
+    let Token = jwt.sign({ id: result._id }, JWTSECRET, { expiresIn: '600000' })
+
+    return ({ status: true, message: "Logged in Succeccfuly", UseResult: result, token: Token });
 });
 
 var userUpdate = (async function(userId, requestBody, res){

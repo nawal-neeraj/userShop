@@ -1,6 +1,7 @@
 var user = require('../modal/usermodel');
 var userService = require('../services/users.services')
 var tokenVarify = require('../utils/varifyToken')
+var getDetails = require('../utils/redisGet')
 
 var signup = (async function (req, res, next) {
     var requestBody = new user({
@@ -27,7 +28,7 @@ var signIn = (async function (req, res, next) {
     let userNm = req.body.username;
     let userPass = req.body.password;
     let userResponse = await userService.userSignin(userNm, userPass);
-    res.send({ status: true, message: 'Login successful', user: userResponse.UseResult, token: userResponse.token });
+    res.send({ status: userResponse.status, message: userResponse.message, user: userResponse.UseResult, token: userResponse.token });
 });
 
 var varifyToken = (async function (req, res) {
@@ -46,10 +47,15 @@ var updateProfile = (async function (req, res) {
         address: req.body.address,
     }
     let result = await userService.userUpdate(userId, requestBody, res)
-    if(!result){
-        return res.status(404).send({message:'user not found'})
+    if (!result) {
+        return res.status(404).send({ message: 'user not found' })
     }
-    res.status(200).send({message:"Updated successfully!"})
+    res.status(200).send({ message: "Updated successfully!" })
 });
 
-module.exports = { signup, verifyOTP, signIn, varifyToken, updateProfile };
+var getUserDetails = (async function (req, res, next) {
+    let usersId = req.params.usersId;
+    let userDetail = getDetails.redisGetDetails(usersId, res)
+});
+
+module.exports = { signup, verifyOTP, signIn, varifyToken, updateProfile, getUserDetails };
