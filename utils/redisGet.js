@@ -4,11 +4,11 @@ const saveUser = redis.createClient(Redis_Port);
 
 exports.redisGetDetails = async (userId, res) => {
     try{
-        await saveUser.get(userId, (err, data) => {
+        await saveUser.hgetall(userId, (err, data) => {
             if (err) {
                 console.error(err)
             }
-            return res.send({status:true, name:data})
+            return res.send({status:true, details:data})
         })
     }
     catch(err){

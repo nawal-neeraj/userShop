@@ -16,7 +16,7 @@ var tokenCheck = (async function (token, res ) {
             return res.send({ status: false, message: "Please login again" });
         }
         let userDetails = await user.findById({ _id: decodedToken.id }).lean();
-        let resRedis = await redisRes.redisSave(decodedToken.id ,userDetails)
+        let resRedis = await redisRes.redisSave(decodedToken.id ,userDetails, res)
         return userDetails;
     }
     catch (e) {
