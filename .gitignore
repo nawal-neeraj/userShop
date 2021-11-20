@@ -1,1 +1,10 @@
 node_modules
+bin
+config
+controller
+modal
+public
+route
+service
+utils
+views
