@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 var userSchema = new mongoose.Schema({
     name: {
         type: String
@@ -23,6 +22,10 @@ var userSchema = new mongoose.Schema({
     otp: {
         type: String,
         default: null,
+    },
+    status: {
+        type: String,
+        default: "Inactive"
     }
 });
 
