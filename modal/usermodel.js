@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 var userSchema = new mongoose.Schema({
     name: {
@@ -26,7 +27,8 @@ var userSchema = new mongoose.Schema({
     status: {
         type: String,
         default: "Inactive"
-    }
+    },
+
 });
 
 var user = mongoose.model('user', userSchema);
